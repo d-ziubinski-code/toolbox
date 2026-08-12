@@ -1,7 +1,8 @@
 import logging
 import subprocess
 import sys
-
+import ssl
+import socket
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,9 +33,11 @@ def network_scanner(host: str, ports: str):
 
 def main(host, ports):
     open_ports = network_scanner(host, ports)
-
+    print(open_ports)
     for port in open_ports:
-        print(port)
+        num, status, tech = port.split(maxsplit=2)
+        if 'ssl' in tech:
+            print(f"Port {tech}: {num}")
 
 
 if __name__ == "__main__":
