@@ -1,9 +1,23 @@
+import logging
 import subprocess
+import sys
+import ssl
+import socket
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+            logging.StreamHandler()
+        ]
 
 
-def network_scanner(host: str):
+)
+
+def network_scanner(host: str, ports: str):
     res = subprocess.run(
-        ["nmap", "-sV", "-p", "31000-32000", host],
+        ["nmap", "-sV", "-p", ports, host],
         capture_output=True,
         text=True
     )
@@ -17,12 +31,21 @@ def network_scanner(host: str):
     return open_ports
 
 
-def main():
-    open_ports = network_scanner("localhost")
-
+def main(host, ports):
+    open_ports = network_scanner(host, ports)
+    print(open_ports)
     for port in open_ports:
-        print(port)
+        num, status, tech = port.split(maxsplit=2)
+        if 'ssl' in tech:
+            print(f"Port {tech}: {num}")
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 3:
+        logging.info("Użycie: python skrypt.py <host> <porty>")
+        logging.info("Przykład: python main.py 127.0.0.1 31000-32000 ")
+        sys.exit(1)
+
+    host = sys.argv[1]
+    ports = sys.argv[2]
+    main(host, ports)
